@@ -1,0 +1,97 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Phone Number Lookup
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /:
+    x-swagger-router-controller: business
+    post:
+      description: lookup a business, return the phone number
+      operationId: lookup
+      parameters:
+        - name: name
+          description: The name of the business you wish to look up the phone number for.
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Business"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/LookupResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  Business:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the business to look up.
+    required:
+      - name
+  LookupResponse:
+    type: object
+    properties:
+      success:
+        type: number
+        description: returns 1 if successful
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The name of the business.
+            address:
+              type: string
+              description: The address of the business.
+            phone:
+              type: object
+              properties:
+                international:
+                  type: string
+                  description: The international phone number
+                formatted:
+                  type: string
+                  description: The formatted phone number
+  GeneralResponse:
+    type: object
+    properties:
+      success:
+        type: number
+        description: returns 1 if successful
+      description:
+        type: string
+        description: a short comment
+    required:
+      - success
+      - description
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
